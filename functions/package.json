@@ -1,0 +1,31 @@
+{
+  "name": "miestudiomarket-ai-functions",
+  "description": "MiEstudioMarket AI — Cloud Functions backend with Genkit RAG orchestration",
+  "scripts": {
+    "build": "./node_modules/.bin/tsc",
+    "build:watch": "./node_modules/.bin/tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log",
+    "genkit:start": "npx genkit start -- npx tsx --watch src/index.ts"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "firebase-admin": "^13.0.0",
+    "firebase-functions": "^6.3.0",
+    "genkit": "^1.0.0",
+    "@genkit-ai/firebase": "^1.0.0",
+    "@genkit-ai/vertexai": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^20.0.0"
+  },
+  "private": true
+}
