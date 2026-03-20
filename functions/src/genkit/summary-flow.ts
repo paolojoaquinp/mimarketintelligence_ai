@@ -12,7 +12,7 @@
  * - Source citations with SourceRef (US01 AC3, QA-04)
  */
 import { Genkit } from "genkit";
-import { gemini20Flash, textEmbedding004 } from "@genkit-ai/vertexai";
+import { vertexAI } from "@genkit-ai/google-genai";
 import { defineFirestoreRetriever } from "@genkit-ai/firebase";
 import * as admin from "firebase-admin";
 import * as logger from "firebase-functions/logger";
@@ -47,12 +47,14 @@ REGLAS ABSOLUTAS:
    los datos macroeconómicos a oportunidades para microempresarios locales.
 
 FORMATO DE RESPUESTA:
-Responde en formato JSON con la siguiente estructura:
+Debes responder ÚNICAMENTE con un objeto JSON válido, sin delimitadores de código (markdown), con esta estructura exacta:
 {
-  "summary": "Resumen ejecutivo del reporte...",
-  "localImpact": "Análisis de impacto local para microempresarios...",
+  "summary": "Resumen ejecutivo detallado de los hallazgos clave...",
+  "localImpact": "Traducción de tendencias globales a impacto para microempresarios locales...",
   "citedPages": [1, 3, 5]
-}`;
+}
+
+Si la información del contexto es muy limitada, haz el mejor resumen posible con lo que tengas en lugar de decir "Información no disponible".`;
 
 /**
  * Creates and configures the Firestore vector retriever for report chunks.
@@ -65,7 +67,7 @@ export function createReportRetriever(ai: Genkit) {
     label: "Report Chunks Retriever",
     firestore,
     collection: "report_chunks",
-    embedder: textEmbedding004,
+    embedder: vertexAI.embedder("text-embedding-004", {outputDimensionality: 768}),
     vectorField: "embedding",
     contentField: "content",
     distanceMeasure: "COSINE",
@@ -88,10 +90,15 @@ export async function generateReportSummary(
   const retriever = createReportRetriever(ai);
 
   // Step 1: Retrieve relevant chunks using vector similarity.
+  // We use a semantic keyword query instead of the user's meta-instruction to get better vector matches.
+  const semanticQuery = "resumen ejecutivo, hallazgos principales, conclusiones, mercado, tendencias, ingresos, proyección";
+  
   const retrievalResult = await ai.retrieve({
     retriever,
-    query,
-    options: { limit: 10 },
+    query: semanticQuery,
+    options: { 
+      limit: 15
+    },
   });
 
   logger.info("Retrieved relevant chunks", {
@@ -111,10 +118,10 @@ export async function generateReportSummary(
 
   const context = contextParts.join("\n\n---\n\n");
 
-  // Step 3: Generate summary with Gemini 2.0 Flash.
+  // Step 3: Generate summary with Gemini 1.5 Flash.
   // Why Flash: design.md prescribes Flash for summarization (fast, cost-effective).
   const response = await ai.generate({
-    model: gemini20Flash,
+    model: vertexAI.model('gemini-2.5-flash'),
     system: SUMMARY_SYSTEM_PROMPT,
     prompt: `Basándote EXCLUSIVAMENTE en el siguiente contexto extraído de reportes de mercado, 
 genera un resumen ejecutivo para el reporte con ID: ${reportId}.

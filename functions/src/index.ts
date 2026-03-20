@@ -5,7 +5,7 @@
  * Registers Cloud Function triggers for the RAG pipeline.
  */
 import { genkit } from "genkit";
-import { vertexAI } from "@genkit-ai/vertexai";
+import { vertexAI } from "@genkit-ai/google-genai";
 import { enableFirebaseTelemetry } from "@genkit-ai/firebase";
 import { onRequest, onCall } from "firebase-functions/v2/https";
 import { onObjectFinalized } from "firebase-functions/v2/storage";
@@ -25,7 +25,7 @@ enableFirebaseTelemetry();
 // Initialize Genkit with Vertex AI plugin.
 // Why Gemini 2.0 Flash as default: design.md prescribes it for
 // fast summarization flows (US01), with Pro reserved for deep analysis (US02).
-export const ai = genkit({
+const ai = genkit({
   plugins: [vertexAI()],
 });
 

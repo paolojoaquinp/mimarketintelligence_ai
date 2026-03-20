@@ -1,10 +1,10 @@
 rules_version = '2';
 
-// Restrictive default — deny all access until authenticated upload rules are defined.
+// MVP Rules: Open for testing.
 service firebase.storage {
   match /b/{bucket}/o {
-    match /{allPaths=**} {
-      allow read, write: if false;
+    match /reports/{allPaths=**} {
+      allow read, write: if true;
     }
   }
 }

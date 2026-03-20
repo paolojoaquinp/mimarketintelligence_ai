@@ -8,7 +8,7 @@
  * For each gap found, generates a detailed Buyer Persona (US02 AC3).
  */
 import { Genkit } from "genkit";
-import { gemini15Pro, textEmbedding004 } from "@genkit-ai/vertexai";
+import { vertexAI } from "@genkit-ai/google-genai";
 import { defineFirestoreRetriever } from "@genkit-ai/firebase";
 import * as admin from "firebase-admin";
 import * as logger from "firebase-functions/logger";
@@ -82,7 +82,7 @@ function createTrendRetriever(ai: Genkit) {
     label: "Trend Data Retriever",
     firestore,
     collection: "report_chunks",
-    embedder: textEmbedding004,
+    embedder: vertexAI.embedder("text-embedding-004", {outputDimensionality: 768}),
     vectorField: "embedding",
     contentField: "content",
     distanceMeasure: "COSINE",
@@ -165,7 +165,7 @@ export async function analyzeMarketGaps(
   // Step 4: Generate market gap analysis with Gemini 1.5 Pro.
   // Why Pro: design.md model router prescribes Pro for deep "Puntos Ciegos" analysis.
   const response = await ai.generate({
-    model: gemini15Pro,
+    model: vertexAI.model('gemini-2.5-flash'),
     system: MARKET_GAPS_SYSTEM_PROMPT,
     prompt: `Analiza las siguientes tendencias de mercado y compáralas con la oferta de competidores locales 
 para identificar nichos desatendidos.

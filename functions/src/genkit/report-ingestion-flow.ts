@@ -8,14 +8,14 @@
  * ingestion to avoid blocking the main thread.
  */
 import { Genkit } from "genkit";
-import { textEmbedding004 } from "@genkit-ai/vertexai";
+import { vertexAI } from "@genkit-ai/google-genai";
 import * as admin from "firebase-admin";
 import * as logger from "firebase-functions/logger";
 import { extractAndChunkPdf, TextChunk } from "../utils/pdf-processor";
 import { ReportChunkDocument, ReportStatus } from "../types/firestore-schemas";
 
-/** Batch size for Firestore writes to avoid exceeding 500-write limit. */
-const FIRESTORE_BATCH_LIMIT = 400;
+/** Batch size for Firestore writes. Reduced to 50 to avoid 'Transaction too big' (10 MiB limit) due to large embedding vectors. */
+const FIRESTORE_BATCH_LIMIT = 50;
 
 /**
  * Processes a newly uploaded PDF report.
@@ -82,7 +82,7 @@ async function generateEmbeddings(
     const embeddings = await Promise.all(
       batch.map(async (chunk) => {
         const response = await ai.embed({
-          embedder: textEmbedding004,
+          embedder: vertexAI.embedder("text-embedding-004", {outputDimensionality: 768}),
           content: chunk.content,
         });
         // ai.embed() returns EmbedResponse[]; extract the vector from the first element.
