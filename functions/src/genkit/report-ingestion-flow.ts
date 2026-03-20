@@ -106,6 +106,8 @@ async function storeChunksInFirestore(
   reportId: string,
   chunks: Array<TextChunk & { embedding: number[] }>
 ): Promise<void> {
+  const { FieldValue } = admin.firestore;
+  
   for (let i = 0; i < chunks.length; i += FIRESTORE_BATCH_LIMIT) {
     const batch = db.batch();
     const batchChunks = chunks.slice(i, i + FIRESTORE_BATCH_LIMIT);
@@ -115,7 +117,8 @@ async function storeChunksInFirestore(
       const doc: ReportChunkDocument = {
         reportId,
         content: chunk.content,
-        embedding: chunk.embedding,
+        // Enforce vector type so Genkit COSINE searches work
+        embedding: FieldValue.vector(chunk.embedding),
         sourceRef: chunk.sourceRef,
       };
       batch.set(docRef, doc);
@@ -133,3 +136,5 @@ async function updateReportStatus(
 ): Promise<void> {
   await db.collection("reports").doc(reportId).update({ status });
 }
+
+

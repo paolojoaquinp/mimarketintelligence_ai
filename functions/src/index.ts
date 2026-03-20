@@ -23,11 +23,11 @@ admin.initializeApp();
 enableFirebaseTelemetry();
 
 // Initialize Genkit with Vertex AI plugin.
-// Why Gemini 2.0 Flash as default: design.md prescribes it for
-// fast summarization flows (US01), with Pro reserved for deep analysis (US02).
+// Using us-east1 to ensure availability of newer Gemini 2.5/Pro models.
 const ai = genkit({
-  plugins: [vertexAI()],
+  plugins: [vertexAI({ location: 'us-east1' })],
 });
+
 
 /**
  * Health check endpoint to verify the Cloud Functions + Genkit setup.
@@ -162,5 +162,80 @@ export const addCompetitor = onCall(
 
     logger.info("Competitor added", { id: docRef.id, name });
     return { id: docRef.id };
+  }
+);
+
+/**
+ * Callable function for US03 AC1: Commodity Feed (Mock).
+ * Returns static base costs for raw materials.
+ */
+export const getCommodityPrices = onCall(
+  { region: "us-central1" },
+  async () => {
+    // In a real app, this would hit a live pricing API.
+    return {
+      commodities: [
+        { id: "pollo_entero", name: "Pollo Entero", price: 2.10, unit: "kg" },
+        { id: "pechuga_pollo", name: "Pechuga de Pollo", price: 3.50, unit: "kg" },
+        { id: "cerdo_pierna", name: "Pierna de Cerdo", price: 4.20, unit: "kg" },
+        { id: "res_molida", name: "Res Molida", price: 5.80, unit: "kg" },
+      ],
+      lastUpdated: new Date().toISOString(),
+    };
+  }
+);
+
+/**
+ * Callable function for US03 AC2/AC3: Price Simulator.
+ * Uses Genkit to find market average and calculates Margin Traffic Light.
+ */
+export const simulatePrices = onCall(
+  {
+    region: "us-central1",
+    memory: "512MiB",
+    timeoutSeconds: 60,
+  },
+  async (request) => {
+    const { productName, userBaseCost, userSalePrice } = request.data;
+
+    if (!productName || typeof productName !== "string") {
+      throw new Error("productName is required");
+    }
+    if (typeof userBaseCost !== "number" || typeof userSalePrice !== "number") {
+      throw new Error("userBaseCost and userSalePrice must be numbers");
+    }
+
+    // 1. Run Genkit flow to find Market Average Price
+    const { simulatePricesFlow } = await import("./genkit/price-simulator-flow");
+    const aiResult = await simulatePricesFlow({ productName, userBaseCost, userSalePrice });
+
+    // 2. Calculate Margin (US03 AC3)
+    // Margin formula: (Sale Price - Cost) / Sale Price
+    const marginPercentage = ((userSalePrice - userBaseCost) / userSalePrice) * 100;
+
+    let trafficLight: "GREEN" | "YELLOW" | "RED" = "RED";
+    if (marginPercentage > 30) {
+      trafficLight = "GREEN";
+    } else if (marginPercentage >= 15) {
+      trafficLight = "YELLOW";
+    }
+
+    // 3. Save to Firestore history (optional but good for tracking)
+    const db = admin.firestore();
+    const simData = {
+      productName,
+      userBaseCost,
+      userSalePrice,
+      marketAveragePrice: aiResult.marketAveragePrice,
+      marginPercentage: Math.round(marginPercentage * 10) / 10,
+      trafficLight,
+      confidenceScore: aiResult.confidenceScore,
+      insights: aiResult.insights,
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+    };
+    
+    await db.collection("pricing_simulations").add(simData);
+
+    return simData;
   }
 );

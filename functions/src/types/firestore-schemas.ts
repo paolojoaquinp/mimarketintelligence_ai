@@ -35,7 +35,7 @@ export interface ReportDocument {
 export interface ReportChunkDocument {
   reportId: string;
   content: string;
-  embedding: number[];
+  embedding: any; // Accept FieldValue.vector() type
   sourceRef: SourceRef;
 }
 
@@ -65,12 +65,25 @@ export interface CompetitorDocument {
  * Buyer persona generated per identified market niche (US02 AC3).
  */
 export interface BuyerPersona {
-  name: string;
-  ageRange: string;
-  income: string;
-  behaviors: string[];
+  niche: string;
+  demographics: string;
   painPoints: string[];
-  motivations: string[];
+  buyingBehavior: string;
+}
+
+/**
+ * Phase 3: Price Simulator result.
+ */
+export interface PricingSimulation {
+  productName: string;
+  userBaseCost: number;
+  userSalePrice: number;
+  marketAveragePrice: number;
+  marginPercentage: number;
+  trafficLight: "GREEN" | "YELLOW" | "RED";
+  confidenceScore: number;
+  insights: string;
+  timestamp: FirebaseFirestore.Timestamp | Date;
 }
 
 /**

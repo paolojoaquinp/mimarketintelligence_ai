@@ -59,12 +59,10 @@ FORMATO DE RESPUESTA (JSON):
       "supplyScore": 15,
       "opportunity": "Descripción de la oportunidad de negocio",
       "buyerPersona": {
-        "name": "Nombre representativo del consumidor",
-        "ageRange": "25-35",
-        "income": "Medio-alto",
-        "behaviors": ["comportamiento 1", "comportamiento 2"],
+        "niche": "Segmento o perfil específico",
+        "demographics": "Ej: 25-35 años, ingreso medio-alto",
         "painPoints": ["punto de dolor 1", "punto de dolor 2"],
-        "motivations": ["motivación 1", "motivación 2"]
+        "buyingBehavior": "Descripción del comportamiento de compra o motivaciones"
       },
       "citedPages": [1, 5, 12]
     }
@@ -134,7 +132,10 @@ export async function analyzeMarketGaps(
   const retrievalResult = await ai.retrieve({
     retriever,
     query: trendQuery,
-    options: { limit: 15 },
+    options: { 
+      limit: 15,
+      where: { reportId }
+    },
   });
 
   logger.info("Retrieved trend chunks", {
@@ -165,7 +166,7 @@ export async function analyzeMarketGaps(
   // Step 4: Generate market gap analysis with Gemini 1.5 Pro.
   // Why Pro: design.md model router prescribes Pro for deep "Puntos Ciegos" analysis.
   const response = await ai.generate({
-    model: vertexAI.model('gemini-2.5-flash'),
+    model: vertexAI.model('gemini-2.5-pro'),
     system: MARKET_GAPS_SYSTEM_PROMPT,
     prompt: `Analiza las siguientes tendencias de mercado y compáralas con la oferta de competidores locales 
 para identificar nichos desatendidos.

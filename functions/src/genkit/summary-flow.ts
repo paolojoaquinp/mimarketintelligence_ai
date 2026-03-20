@@ -97,7 +97,8 @@ export async function generateReportSummary(
     retriever,
     query: semanticQuery,
     options: { 
-      limit: 15
+      limit: 15,
+      where: { reportId }
     },
   });
 
