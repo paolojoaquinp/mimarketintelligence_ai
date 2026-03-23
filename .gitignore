@@ -30,3 +30,6 @@ firebase-debug.log*
 
 # Genkit
 .genkit/
+
+# Internal docs (not for public repo)
+docs/
