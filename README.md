@@ -42,18 +42,37 @@ Plataforma analítica que transforma reportes globales masivos en estrategias de
 - Node.js 20+
 - Firebase CLI 15+
 
-### Setup
+### Setup & Development
 
 ```bash
+# 1. Install dependencies
 # Flutter app
-cd miestudiomarket_ai_app
-flutter pub get
+cd miestudiomarket_ai_app && flutter pub get
 
 # Cloud Functions
-cd ../functions
-npm install
+cd ../functions && npm install
+
+# 2. Local Build
 npm run build
 ```
+
+### Deployment
+
+Para desplegar el proyecto completo o componentes específicos:
+
+```bash
+# Desplegar todo (Functions, Rules, Indexes)
+firebase deploy
+
+# Desplegar solo funciones
+firebase deploy --only functions
+
+# Desplegar índices de Firestore (requerido para búsquedas vectoriales)
+firebase deploy --only firestore:indexes
+```
+
+> [!NOTE]
+> Si encuentras errores de índices en la consola de Firebase al realizar búsquedas, sigue el enlace proporcionado en el error para generar automáticamente el índice faltante.
 
 ## Documentation
 
