@@ -4,6 +4,12 @@
 
 App móvil agentica(agent) que transforma reportes globales masivos en estrategias de ejecución local para microempresarios, utilizando un motor RAG (Retrieval-Augmented Generation).
 
+## Diagrama C4 (Estructura del proyecto)
+
+En el siguiente diagrama se muestra la estructura del proyecto, donde se puede observar la interaccion entre los diferentes componentes del sistema.
+
+![Contenedores.png](./screenshots/Contenedores.png)
+
 ## Project Structure (Monorepo)
 
 ```
