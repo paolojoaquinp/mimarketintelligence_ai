@@ -82,4 +82,4 @@ El código fuente se localiza en el directorio app_example. Es imperativo genera
 - [Requirements](docs/requirements.md) — User stories and acceptance criteria
 - [Design](docs/design.md) — Architecture, patterns, and quality attributes
 
-Autor: @paolojoaquinp
+Autor: [@paolojoaquinp](https://beacons.ai/paolojoaquinp)
