@@ -1,7 +1,7 @@
 name: miestudiomarket_ai_app
-description: "A new Flutter project."
+description: "MiEstudioMarket AI - De datos crudos a decisiones premium"
 publish_to: 'none'
-version: 0.1.0
+version: 1.0.0+1
 
 environment:
   sdk: ^3.9.2
@@ -10,6 +10,21 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # Firebase
+  firebase_core: ^4.5.0
+  cloud_firestore: ^6.1.3
+  firebase_storage: ^13.1.0
+  firebase_app_check: ^0.4.1+5
+
+  # UI
+  cupertino_icons: ^1.0.8
+  file_picker: ^10.3.10
+  cloud_functions: ^6.0.7
+  fl_chart: ^1.2.0
+  google_fonts: ^8.0.2
+  rive: ^0.14.4
+  lottie: ^3.3.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -17,3 +32,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/rives/
+    - assets/lotties/
