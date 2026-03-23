@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+
+# Firebase configuration (SENSITIVE)
+# Do not commit these as they contain project-specific keys
+miestudiomarket_ai_app/lib/firebase_options.dart
+miestudiomarket_ai_app/android/app/google-services.json
+miestudiomarket_ai_app/ios/Runner/GoogleService-Info.plist
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Log files
+*.log
+firebase-debug.log*
+
+# Genkit
+.genkit/
