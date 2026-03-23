@@ -28,7 +28,7 @@ Plataforma analítica que transforma reportes globales masivos en estrategias de
 | Layer | Technology |
 |:------|:-----------|
 | Frontend | Flutter (Material Design 3) |
-| Backend | Firebase Cloud Functions (TypeScript) |
+| Backend | Node: Firebase Cloud Functions (TypeScript) |
 | AI Orchestration | Firebase Genkit + Vertex AI (Gemini) |
 | Database | Cloud Firestore (with Vector Search) |
 | Storage | Firebase Cloud Storage |
@@ -68,6 +68,7 @@ firebase deploy
 firebase deploy --only functions
 
 # Desplegar índices de Firestore (requerido para búsquedas vectoriales)
+#### de otra forma buscar en el log de cloud run suggestion de creacion de index
 firebase deploy --only firestore:indexes
 ```
 
